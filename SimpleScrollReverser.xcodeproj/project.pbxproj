@@ -20,6 +20,7 @@
 		A1000000000000000000000B /* PreferencesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* PreferencesView.swift */; };
 		A10000000000000000000010 /* ScrollDoodleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* ScrollDoodleView.swift */; };
 		A10000000000000000000011 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* VisualEffectView.swift */; };
+		A10000000000000000000012 /* SetupGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* SetupGuideView.swift */; };
 		A1000000000000000000000C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* Assets.xcassets */; };
 		A1000000000000000000000D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* IOKit.framework */; };
 		A1000000000000000000000E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* ServiceManagement.framework */; };
@@ -40,6 +41,7 @@
 		A2000000000000000000000B /* PreferencesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesView.swift; sourceTree = "<group>"; };
 		A20000000000000000000012 /* ScrollDoodleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollDoodleView.swift; sourceTree = "<group>"; };
 		A20000000000000000000013 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
+		A20000000000000000000014 /* SetupGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupGuideView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2000000000000000000000D /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		A2000000000000000000000E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
@@ -88,6 +90,7 @@
 				A2000000000000000000000B /* PreferencesView.swift */,
 				A20000000000000000000012 /* ScrollDoodleView.swift */,
 				A20000000000000000000013 /* VisualEffectView.swift */,
+				A20000000000000000000014 /* SetupGuideView.swift */,
 				A2000000000000000000000C /* Assets.xcassets */,
 				A20000000000000000000010 /* Info.plist */,
 				A20000000000000000000011 /* SimpleScrollReverser.entitlements */,
@@ -196,6 +199,7 @@
 				A1000000000000000000000B /* PreferencesView.swift in Sources */,
 				A10000000000000000000010 /* ScrollDoodleView.swift in Sources */,
 				A10000000000000000000011 /* VisualEffectView.swift in Sources */,
+				A10000000000000000000012 /* SetupGuideView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -20,6 +20,7 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         }
         window.makeKeyAndOrderFront(nil)
         window.collectionBehavior = [.moveToActiveSpace]
+        AppModel.shared.preparePreferencesPresentation()
     }
 
     private func makeWindowIfNeeded() -> NSWindow {

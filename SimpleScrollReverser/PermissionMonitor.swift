@@ -68,23 +68,54 @@ final class PermissionMonitor: @unchecked Sendable {
 }
 
 enum PrivacySettingsOpener {
+    static let quarantineRemovalCommand = "xattr -cr \"/Applications/Simple Scroll Reverser.app\""
+
+    /// Privacy & Security root — where “Open Anyway” appears after a Gatekeeper block.
+    static func openPrivacyAndSecurity() {
+        openFirstWorking([
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension",
+            "x-apple.systempreferences:com.apple.preference.security",
+            "x-apple.systempreferences:com.apple.preference.security?General"
+        ])
+    }
+
     static func openAccessibilityAndPrompt() {
         let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString
         AXIsProcessTrustedWithOptions([promptKey: true] as CFDictionary)
-        open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"))
+        openFirstWorking([
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility"
+        ])
     }
 
     static func openInputMonitoringAndPrompt() {
         CGRequestListenEventAccess()
-        open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent"))
+        openFirstWorking([
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_ListenEvent"
+        ])
     }
 
     static func openLoginItems() {
-        open(URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension"))
+        openFirstWorking([
+            "x-apple.systempreferences:com.apple.LoginItems-Settings.extension",
+            "x-apple.systempreferences:com.apple.preferences.users"
+        ])
     }
 
-    private static func open(_ url: URL?) {
-        guard let url else { return }
-        NSWorkspace.shared.open(url)
+    static func copyQuarantineCommand() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(quarantineRemovalCommand, forType: .string)
+    }
+
+    @discardableResult
+    private static func openFirstWorking(_ candidates: [String]) -> Bool {
+        for string in candidates {
+            guard let url = URL(string: string) else { continue }
+            if NSWorkspace.shared.open(url) {
+                return true
+            }
+        }
+        return false
     }
 }

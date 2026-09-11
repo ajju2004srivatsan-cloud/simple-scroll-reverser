@@ -66,6 +66,11 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         PreferencesWindowController.shared.show()
     }
 
+    @objc private func openSetupGuide(_ sender: Any?) {
+        AppModel.shared.showSetupGuide()
+        PreferencesWindowController.shared.show()
+    }
+
     @objc private func quit(_ sender: Any?) {
         NSApp.terminate(nil)
     }
@@ -90,11 +95,14 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
 
         if model.permissions.needsAttention {
-            let item = NSMenuItem(title: "Permissions Needed…", action: #selector(openPreferences), keyEquivalent: "")
+            let item = NSMenuItem(title: "Permissions Needed…", action: #selector(openSetupGuide), keyEquivalent: "")
             item.target = self
             menu.addItem(item)
         }
 
+        let setup = NSMenuItem(title: "Setup Guide…", action: #selector(openSetupGuide), keyEquivalent: "")
+        setup.target = self
+        menu.addItem(setup)
         let prefs = NSMenuItem(title: "Preferences…", action: #selector(openPreferences), keyEquivalent: ",")
         prefs.target = self
         menu.addItem(prefs)

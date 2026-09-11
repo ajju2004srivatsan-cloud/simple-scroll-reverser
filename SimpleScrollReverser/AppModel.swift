@@ -12,9 +12,10 @@ final class AppModel: ObservableObject {
     @Published private(set) var loginItemHint: String?
     @Published private(set) var hasSeenDiscreteWheel: Bool = false
     @Published private(set) var lastDeviceLabel: String?
+    @Published private(set) var isShowingSetup: Bool
 
     var shouldShowPreferencesOnLaunch: Bool {
-        !AppSettings.hasLaunchedBefore || !permissions.canInstallEventTap
+        !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap
     }
 
     private let permissionMonitor = PermissionMonitor()
@@ -26,9 +27,11 @@ final class AppModel: ObservableObject {
         let loaded = AppSettings.load()
         settings = loaded
         SettingsStore.shared.update(loaded)
-        permissions = PermissionMonitor.currentState()
+        let permissionState = PermissionMonitor.currentState()
+        permissions = permissionState
         loginItemEnabled = LoginItemService.isEnabled
         loginItemHint = LoginItemService.statusHint
+        isShowingSetup = !AppSettings.hasCompletedSetup || !permissionState.canInstallEventTap
     }
 
     func start() {
@@ -45,8 +48,13 @@ final class AppModel: ObservableObject {
         }
         permissionMonitor.start { [weak self] state in
             Task { @MainActor in
-                self?.permissions = state
-                self?.syncEventTap()
+                guard let self else { return }
+                let previous = self.permissions
+                self.permissions = state
+                self.syncEventTap()
+                if self.isShowingSetup && !state.needsAttention && previous.needsAttention {
+                    self.completeSetup()
+                }
             }
         }
         wakeObserver = NSWorkspace.shared.notificationCenter.addObserver(
@@ -122,6 +130,27 @@ final class AppModel: ObservableObject {
     func requestInputMonitoring() {
         PrivacySettingsOpener.openInputMonitoringAndPrompt()
         refreshPermissions()
+    }
+
+    func openPrivacyAndSecurity() {
+        PrivacySettingsOpener.openPrivacyAndSecurity()
+    }
+
+    func showSetupGuide() {
+        isShowingSetup = true
+    }
+
+    func completeSetup() {
+        guard permissions.canInstallEventTap else { return }
+        AppSettings.hasCompletedSetup = true
+        isShowingSetup = false
+    }
+
+    func preparePreferencesPresentation() {
+        refreshPermissions()
+        if !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap {
+            isShowingSetup = true
+        }
     }
 
     func openLoginItemsSettings() {
