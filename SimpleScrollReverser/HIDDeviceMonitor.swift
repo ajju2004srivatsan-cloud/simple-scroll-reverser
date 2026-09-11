@@ -22,7 +22,7 @@ final class HIDDeviceMonitor: @unchecked Sendable {
         lock.unlock()
 
         let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-        IOHIDManagerSetDeviceMatchingMultiple(manager, Self.matchingCriteria() as NSArray)
+        IOHIDManagerSetDeviceMatchingMultiple(manager, Self.matchingCriteria())
 
         let context = Unmanaged.passUnretained(self).toOpaque()
         IOHIDManagerRegisterDeviceMatchingCallback(manager, Self.deviceAdded, context)
@@ -31,11 +31,10 @@ final class HIDDeviceMonitor: @unchecked Sendable {
         IOHIDManagerScheduleWithRunLoop(manager, CFRunLoopGetMain(), CFRunLoopMode.defaultMode.rawValue)
         IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
 
-        if let devices = IOHIDManagerCopyDevices(manager) {
-            for object in (devices as NSSet) {
-                remember(object as IOHIDDevice)
-            }
-        }
+        // Already-attached matching devices are reported through `deviceAdded`.
+        // Do not walk IOHIDManagerCopyDevices() via NSSet: IOHIDDevice is a CF
+        // type, so `as?` / `as` from `Any` fail on current Xcode (either
+        // "always succeeds" or "'Any' is not convertible").
 
         lock.lock()
         self.manager = manager
@@ -92,8 +91,8 @@ final class HIDDeviceMonitor: @unchecked Sendable {
     }
 
     private func classify(_ device: IOHIDDevice) -> DeviceKind {
-        let product = stringProperty(device, kIOHIDProductKey as String) ?? ""
-        let builtIn = boolProperty(device, "Built-In")
+        let product = stringProperty(device, kIOHIDProductKey as CFString) ?? ""
+        let builtIn = boolProperty(device, "Built-In" as CFString)
         let touchPad = IOHIDDeviceConformsTo(device, HIDUsage.pageDigitizer, HIDUsage.touchPad)
         let mouse = IOHIDDeviceConformsTo(device, HIDUsage.pageGenericDesktop, HIDUsage.mouse)
         return DeviceClassifier.kind(
@@ -104,31 +103,31 @@ final class HIDDeviceMonitor: @unchecked Sendable {
         )
     }
 
-    private func stringProperty(_ device: IOHIDDevice, _ key: String) -> String? {
-        IOHIDDeviceGetProperty(device, key as CFString) as? String
+    private func stringProperty(_ device: IOHIDDevice, _ key: CFString) -> String? {
+        IOHIDDeviceGetProperty(device, key) as? String
     }
 
-    private func boolProperty(_ device: IOHIDDevice, _ key: String) -> Bool {
-        if let number = IOHIDDeviceGetProperty(device, key as CFString) as? NSNumber {
+    private func boolProperty(_ device: IOHIDDevice, _ key: CFString) -> Bool {
+        if let number = IOHIDDeviceGetProperty(device, key) as? NSNumber {
             return number.boolValue
         }
         return false
     }
 
-    private static func matchingCriteria() -> [NSDictionary] {
+    private static func matchingCriteria() -> NSArray {
         [
             [
-                kIOHIDDeviceUsagePageKey as String: NSNumber(value: HIDUsage.pageGenericDesktop),
-                kIOHIDDeviceUsageKey as String: NSNumber(value: HIDUsage.mouse)
-            ],
+                kIOHIDDeviceUsagePageKey: NSNumber(value: HIDUsage.pageGenericDesktop),
+                kIOHIDDeviceUsageKey: NSNumber(value: HIDUsage.mouse)
+            ] as NSDictionary,
             [
-                kIOHIDDeviceUsagePageKey as String: NSNumber(value: HIDUsage.pageGenericDesktop),
-                kIOHIDDeviceUsageKey as String: NSNumber(value: HIDUsage.pointer)
-            ],
+                kIOHIDDeviceUsagePageKey: NSNumber(value: HIDUsage.pageGenericDesktop),
+                kIOHIDDeviceUsageKey: NSNumber(value: HIDUsage.pointer)
+            ] as NSDictionary,
             [
-                kIOHIDDeviceUsagePageKey as String: NSNumber(value: HIDUsage.pageDigitizer),
-                kIOHIDDeviceUsageKey as String: NSNumber(value: HIDUsage.touchPad)
-            ]
+                kIOHIDDeviceUsagePageKey: NSNumber(value: HIDUsage.pageDigitizer),
+                kIOHIDDeviceUsageKey: NSNumber(value: HIDUsage.touchPad)
+            ] as NSDictionary
         ]
     }
 
