@@ -22,20 +22,32 @@ Use a GitHub Release — you do **not** need Xcode for this path:
 
 The zip contains `Simple Scroll Reverser.app`. CI builds it on `macos-latest` as a universal (arm64 + x86_64) ad-hoc signed binary. Binaries are **not** committed to git.
 
-### First launch (Gatekeeper)
+### If Mac says “Not Opened”
 
-These CI builds are **not** Developer ID notarized (that needs Apple certificates). macOS may say the app can’t be opened.
+CI builds are **not** Developer ID notarized (that needs Apple certificates this repo does not have). Double-clicking the unzipped app can show:
 
-1. Unzip, then move `Simple Scroll Reverser.app` to `/Applications`.
-2. Right-click the app → **Open** → **Open**.
-3. If that is blocked, clear the quarantine flag and try again:
+> “Simple Scroll Reverser” Not Opened  
+> Apple could not verify “Simple Scroll Reverser” is free of malware…
+
+That dialog is **Gatekeeper**. It appears **before** the app launches, so Simple Scroll Reverser cannot show a button on that alert or bypass it.
+
+**Allow the app:**
+
+1. Open **System Settings → Privacy & Security**.
+2. Scroll to **Security**.
+3. Click **Open Anyway** for Simple Scroll Reverser, then confirm.
+4. Or in Finder: Control-click `Simple Scroll Reverser.app` → **Open** → **Open**.
+
+If it is still blocked:
 
 ```bash
 xattr -cr "/Applications/Simple Scroll Reverser.app"
 open "/Applications/Simple Scroll Reverser.app"
 ```
 
-Then grant **Accessibility** (and **Input Monitoring** if prompted). Details below.
+After the app is running, the first-launch **Setup Guide** repeats these steps and deep-links to Privacy & Security, Accessibility, and Input Monitoring. The app does **not** claim to skip Gatekeeper. A notarized Developer ID build would remove that first dialog.
+
+Then grant **Accessibility** (required) and **Input Monitoring** (recommended). Details below.
 
 ## Install from source
 
@@ -57,15 +69,14 @@ The prefs window is a small native Settings-style pane: sidebar + grouped SwiftU
 
 ## Grant permissions
 
-Scrolling cannot be inverted until macOS allows this process to observe HID events.
+After Gatekeeper lets the app launch, scrolling still cannot be inverted until macOS allows this process to observe HID events. First launch opens a **Setup Guide** (also under the menu bar item → **Setup Guide…**).
 
-1. Open the app (the preferences window appears on first launch).
-2. If Privacy is listed, click **Open Accessibility Settings**.
-3. Enable **Simple Scroll Reverser** under **System Settings → Privacy & Security → Accessibility**.
-4. If scrolling still does not reverse, also enable it under **Privacy & Security → Input Monitoring**.
-5. Return to the app and click **Check Permissions**, then make sure **Enable Scroll Reverser** is on.
+1. Click **Open Privacy & Security** if you still need the Open Anyway control.
+2. Click **Open Accessibility Settings** and enable **Simple Scroll Reverser**.
+3. Click **Open Input Monitoring Settings** if scrolling does not reverse after Accessibility is on.
+4. When Accessibility shows **Allowed**, choose **Continue to Preferences**.
 
-If the toggle does nothing after a rebuild, remove the app from the Accessibility list with “−”, add it again with “+”, and relaunch.
+If a toggle does nothing after a rebuild, remove the app from the Accessibility list with “−”, add it again with “+”, and relaunch.
 
 ## Recommended settings
 
