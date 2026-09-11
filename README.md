@@ -57,7 +57,11 @@ Then grant **Accessibility** (required) and **Input Monitoring** (recommended). 
 4. Optionally set your **Team** under *Signing & Capabilities* if you want a stable Apple Development signature (recommended so Accessibility permission survives rebuilds). Local ad-hoc signing (`-`) also works for a first run.
 5. Choose **Product → Run** (⌘R), or run `./Scripts/package_app.sh` to produce `dist/SimpleScrollReverser.zip`.
 
-The app is an agent (no Dock icon). Look for the up/down arrows in the menu bar.
+The app is an agent (no Dock icon). Look for the short up/down arrows on the **right side of the menu bar**. If you still do not see it, macOS may have parked extras behind the menu bar overflow chevron (`«`) — click that, or hold **Command** and drag menu extras to rearrange. The status item is a small high-contrast template glyph (or **⇅** if the image cannot load).
+
+The Setup Guide / Preferences window also opens on the **first five launches** and whenever Accessibility is missing, so you are not hunting for a Dock icon.
+
+Replace any older copy in `/Applications` with the new zip from Releases after each update.
 
 Drag `Simple Scroll Reverser.app` to `/Applications` if you want Start at Login to be reliable.
 

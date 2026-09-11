@@ -52,6 +52,7 @@ extension AppSettings {
         static let wheelStepSize = "wheelStepSize"
         static let hasLaunchedBefore = "hasLaunchedBefore"
         static let hasCompletedSetup = "hasCompletedSetup"
+        static let launchCount = "launchCount"
     }
 
     static func load(from defaults: UserDefaults = .standard) -> AppSettings {
@@ -95,5 +96,14 @@ extension AppSettings {
     static var hasLaunchedBefore: Bool {
         get { UserDefaults.standard.bool(forKey: Key.hasLaunchedBefore) }
         set { UserDefaults.standard.set(newValue, forKey: Key.hasLaunchedBefore) }
+    }
+
+    /// Preferences/Setup is shown for the first few launches so a Dock-less
+    /// agent is still discoverable if the menu bar item is crowded out.
+    static let alwaysShowWindowLaunchLimit = 5
+
+    static var launchCount: Int {
+        get { UserDefaults.standard.integer(forKey: Key.launchCount) }
+        set { UserDefaults.standard.set(newValue, forKey: Key.launchCount) }
     }
 }

@@ -8,11 +8,12 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     func install() {
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        item.autosaveName = "SSRStatusItem"
+        item.isVisible = true
+
         if let button = item.button {
-            button.image = menuBarImage(enabled: AppModel.shared.settings.enabled, needsAttention: AppModel.shared.permissions.needsAttention)
-            button.imagePosition = .imageOnly
-            button.toolTip = AppIdentity.displayName
+            applyAppearance(to: button)
         }
 
         let menu = NSMenu()
@@ -76,8 +77,74 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     }
 
     private func refreshIcon() {
-        let model = AppModel.shared
-        statusItem?.button?.image = menuBarImage(enabled: model.settings.enabled, needsAttention: model.permissions.needsAttention)
+        statusItem?.isVisible = true
+        guard let button = statusItem?.button else { return }
+        applyAppearance(to: button)
+    }
+
+    private func applyAppearance(to button: NSStatusBarButton) {
+        button.appearsDisabled = false
+        button.toolTip = AppIdentity.displayName
+        button.setAccessibilityTitle(AppIdentity.displayName)
+
+        if let image = Self.statusImage() {
+            image.isTemplate = true
+            image.size = NSSize(width: 18, height: 18)
+            button.image = image
+            button.title = ""
+            button.imagePosition = .imageOnly
+            button.imageScaling = .scaleProportionallyDown
+            statusItem?.length = NSStatusItem.squareLength
+        } else {
+            // Image-only + nil image is an empty control. Keep a short high-contrast title.
+            button.image = nil
+            button.title = "⇅"
+            button.imagePosition = .imageLeading
+            button.font = NSFont.menuBarFont(ofSize: 13)
+            statusItem?.length = max(NSStatusItem.squareLength, 28)
+        }
+    }
+
+    /// Bundled template, then a drawn glyph, then SF Symbols. Nil only if nothing usable loaded.
+    private static func statusImage() -> NSImage? {
+        if let bundled = usableImage(NSImage(named: "MenuBarIcon")) {
+            bundled.isTemplate = true
+            return bundled
+        }
+        if let drawn = usableImage(drawnTemplateImage()) {
+            return drawn
+        }
+        if let symbol = usableImage(NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: AppIdentity.displayName)) {
+            symbol.isTemplate = true
+            return symbol
+        }
+        return nil
+    }
+
+    private static func usableImage(_ image: NSImage?) -> NSImage? {
+        guard let image, image.size.width >= 8, image.size.height >= 8 else { return nil }
+        return image
+    }
+
+    private static func drawnTemplateImage() -> NSImage {
+        let size = NSSize(width: 18, height: 18)
+        let image = NSImage(size: size, flipped: false) { rect in
+            NSColor.black.setStroke()
+            let path = NSBezierPath()
+            path.lineWidth = 1.6
+            path.lineCapStyle = .round
+            path.lineJoinStyle = .round
+            path.move(to: NSPoint(x: rect.minX + 2.5, y: rect.midY + 1.5))
+            path.line(to: NSPoint(x: rect.minX + 6.5, y: rect.minY + 3.5))
+            path.line(to: NSPoint(x: rect.minX + 10.5, y: rect.midY + 1.5))
+            path.move(to: NSPoint(x: rect.maxX - 10.5, y: rect.midY - 1.5))
+            path.line(to: NSPoint(x: rect.maxX - 6.5, y: rect.maxY - 3.5))
+            path.line(to: NSPoint(x: rect.maxX - 2.5, y: rect.midY - 1.5))
+            path.stroke()
+            return true
+        }
+        image.isTemplate = true
+        return image
     }
 
     private func rebuildMenu(_ menu: NSMenu) {
@@ -117,19 +184,5 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         item.target = self
         item.state = isOn ? .on : .off
         return item
-    }
-
-    private func menuBarImage(enabled: Bool, needsAttention: Bool) -> NSImage? {
-        let name: String
-        if needsAttention {
-            name = "exclamationmark.circle"
-        } else if enabled {
-            name = "arrow.up.arrow.down"
-        } else {
-            name = "pause.circle"
-        }
-        let image = NSImage(systemSymbolName: name, accessibilityDescription: AppIdentity.displayName)
-        image?.isTemplate = true
-        return image
     }
 }

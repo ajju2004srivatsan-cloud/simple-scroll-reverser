@@ -15,7 +15,9 @@ final class AppModel: ObservableObject {
     @Published private(set) var isShowingSetup: Bool
 
     var shouldShowPreferencesOnLaunch: Bool {
-        !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap
+        AppSettings.launchCount <= AppSettings.alwaysShowWindowLaunchLimit
+            || !AppSettings.hasCompletedSetup
+            || !permissions.canInstallEventTap
     }
 
     private let permissionMonitor = PermissionMonitor()
@@ -67,6 +69,7 @@ final class AppModel: ObservableObject {
             }
         }
         syncEventTap()
+        AppSettings.launchCount += 1
         AppSettings.hasLaunchedBefore = true
     }
 
