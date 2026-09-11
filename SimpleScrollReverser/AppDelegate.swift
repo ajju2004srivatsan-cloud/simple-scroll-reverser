@@ -28,12 +28,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        let showPreferencesOnLaunch = AppModel.shared.shouldShowPreferencesOnLaunch
         AppModel.shared.start()
         statusItem.install()
 
-        if showPreferencesOnLaunch {
-            showPreferences()
+        if AppModel.shared.shouldShowPreferencesOnLaunch {
+            PreferencesWindowController.shared.show(forceAttention: true)
         }
     }
 
@@ -54,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func showPreferences() {
-        PreferencesWindowController.shared.show()
+        PreferencesWindowController.shared.show(forceAttention: true)
     }
 
     private func handOffToRunningInstanceIfNeeded() {
