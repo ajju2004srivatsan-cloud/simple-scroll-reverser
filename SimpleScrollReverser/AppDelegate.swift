@@ -16,6 +16,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Status item first, on the main thread, before model/TCC/window work.
+        statusItem.install()
         NSApp.setActivationPolicy(.accessory)
 
         distributedObserver = DistributedNotificationCenter.default().addObserver(
@@ -29,7 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         AppModel.shared.start()
-        statusItem.install()
+        AppModel.shared.requestPrivacyListEntries()
 
         if AppModel.shared.shouldShowPreferencesOnLaunch {
             PreferencesWindowController.shared.show(forceAttention: true)

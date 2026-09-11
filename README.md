@@ -57,9 +57,9 @@ Then grant **Accessibility** (required) and **Input Monitoring** (recommended). 
 4. Optionally set your **Team** under *Signing & Capabilities* if you want a stable Apple Development signature (recommended so Accessibility permission survives rebuilds). Local ad-hoc signing (`-`) also works for a first run.
 5. Choose **Product → Run** (⌘R), or run `./Scripts/package_app.sh` to produce `dist/SimpleScrollReverser.zip`.
 
-The app is an agent (no Dock icon). Look for the short up/down arrows on the **right side of the menu bar**. If you still do not see it, macOS may have parked extras behind the menu bar overflow chevron (`«`) — click that, or hold **Command** and drag menu extras to rearrange. The status item is a small high-contrast template glyph (or **⇅** if the image cannot load).
+The app is a menu-bar utility (no Dock icon). Look for **⇅** plus a short up/down glyph on the **right side of the menu bar**, next to the clock. If you still do not see it, macOS may have parked extras behind the overflow chevron (`«`) — click that, or hold **Command** and drag menu extras to rearrange.
 
-The Setup Guide / Preferences window also opens on the **first five launches** and whenever Accessibility is missing, so you are not hunting for a Dock icon.
+The Setup Guide / Preferences window also opens on the **first five launches** and whenever Accessibility is missing. First launch asks macOS to add Simple Scroll Reverser under Accessibility and Input Monitoring.
 
 Replace any older copy in `/Applications` with the new zip from Releases after each update.
 
@@ -76,9 +76,10 @@ The prefs window is a small native Settings-style pane: sidebar + grouped SwiftU
 After Gatekeeper lets the app launch, scrolling still cannot be inverted until macOS allows this process to observe HID events. First launch opens a **Setup Guide** (also under the menu bar item → **Setup Guide…**).
 
 1. Click **Open Privacy & Security** if you still need the Open Anyway control.
-2. Click **Open Accessibility Settings** and enable **Simple Scroll Reverser**.
-3. Click **Open Input Monitoring Settings** if scrolling does not reverse after Accessibility is on.
-4. When Accessibility shows **Allowed**, choose **Continue to Preferences**.
+2. macOS should show a prompt and add **Simple Scroll Reverser** under **Accessibility**. Turn the toggle ON.
+3. If the app is **not in the list**, click **+**, choose `/Applications/Simple Scroll Reverser.app`, add it, then toggle ON. Keep the app in `/Applications` (not Downloads).
+4. Click **Open Input Monitoring Settings** and enable it the same way if scrolling does not reverse after Accessibility is on.
+5. When Accessibility shows **Allowed**, choose **Continue to Preferences**.
 
 If a toggle does nothing after a rebuild, remove the app from the Accessibility list with “−”, add it again with “+”, and relaunch.
 
