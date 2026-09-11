@@ -157,9 +157,10 @@ final class AppModel: ObservableObject {
     }
 
     func preparePreferencesPresentation() {
-        requestPrivacyListEntries()
+        refreshPermissions()
         if !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap {
             isShowingSetup = true
+            requestPrivacyListEntries()
         }
     }
 

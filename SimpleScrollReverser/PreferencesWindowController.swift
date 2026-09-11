@@ -13,8 +13,10 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         let window = makeWindowIfNeeded()
         AppModel.shared.preparePreferencesPresentation()
         applyPresentation(to: window)
-        window.setContentSize(NSSize(width: 640, height: 520))
-        centerOnActiveScreen(window)
+        if !isFrameUsable(window.frame) {
+            window.setContentSize(NSSize(width: 640, height: 520))
+            centerOnActiveScreen(window)
+        }
 
         if #available(macOS 14.0, *) {
             NSApp.activate()
@@ -50,6 +52,11 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         window.setFrame(frame, display: true)
     }
 
+    private func isFrameUsable(_ frame: NSRect) -> Bool {
+        guard frame.width >= 400, frame.height >= 280 else { return false }
+        return NSScreen.screens.contains { $0.visibleFrame.intersects(frame) }
+    }
+
     private func makeWindowIfNeeded() -> NSWindow {
         if let window {
             return window
@@ -66,11 +73,11 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         window.isOpaque = true
         window.backgroundColor = .windowBackgroundColor
         window.isReleasedWhenClosed = false
-        window.setFrameAutosaveName("SSRPreferences")
         window.delegate = self
         window.level = .floating
         window.tabbingMode = .disallowed
         window.setContentSize(NSSize(width: 640, height: 520))
+        window.setFrameAutosaveName("SSRPreferences")
         self.window = window
         observeSetupState()
         return window
