@@ -70,11 +70,23 @@ struct SetupGuideView: View {
             }
 
             Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    labeledStep("1", "Click the + button under the apps list.")
+                    labeledStep("2", "Choose /Applications/Simple Scroll Reverser.app and add it.")
+                    labeledStep("3", "Turn the toggle ON (Accessibility and Input Monitoring if listed).")
+                }
+            } header: {
+                Label("If the app is not in the list", systemImage: "plus.app")
+            } footer: {
+                Text("Keep Simple Scroll Reverser.app in /Applications, not Downloads. After updating, replace that copy so the Privacy list stays attached to the same app.")
+            }
+
+            Section {
                 permissionCard(
                     title: "Input Monitoring",
                     systemImage: "dot.radiowaves.left.and.right",
                     allowed: model.permissions.inputMonitoringTrusted,
-                    detail: "Recommended on recent macOS so HID scroll events can be observed. Turn this on if scrolling still is not reversed after Accessibility is allowed.",
+                    detail: "Recommended on recent macOS so HID scroll events can be observed. If the app is missing from Input Monitoring, click +, choose /Applications/Simple Scroll Reverser.app, add it, and turn the toggle ON.",
                     buttonTitle: "Open Input Monitoring Settings",
                     action: { model.requestInputMonitoring() },
                     prominent: false
@@ -101,7 +113,7 @@ struct SetupGuideView: View {
         .controlSize(.regular)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
-            model.refreshPermissions()
+            model.requestPrivacyListEntries()
         }
     }
 

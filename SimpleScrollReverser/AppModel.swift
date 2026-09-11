@@ -135,12 +135,19 @@ final class AppModel: ObservableObject {
         refreshPermissions()
     }
 
+    /// Creates TCC rows under Accessibility / Input Monitoring via the public APIs.
+    func requestPrivacyListEntries() {
+        PrivacySettingsOpener.requestPrivacyListEntries()
+        refreshPermissions()
+    }
+
     func openPrivacyAndSecurity() {
         PrivacySettingsOpener.openPrivacyAndSecurity()
     }
 
     func showSetupGuide() {
         isShowingSetup = true
+        requestPrivacyListEntries()
     }
 
     func completeSetup() {
@@ -150,7 +157,7 @@ final class AppModel: ObservableObject {
     }
 
     func preparePreferencesPresentation() {
-        refreshPermissions()
+        requestPrivacyListEntries()
         if !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap {
             isShowingSetup = true
         }
