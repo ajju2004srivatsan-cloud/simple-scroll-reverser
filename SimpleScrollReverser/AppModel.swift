@@ -160,6 +160,7 @@ final class AppModel: ObservableObject {
         refreshPermissions()
         if !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap {
             isShowingSetup = true
+            requestPrivacyListEntries()
         }
     }
 

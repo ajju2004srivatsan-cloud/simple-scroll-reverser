@@ -10,11 +10,10 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     func show(forceAttention _: Bool = false) {
-        let created = window == nil
         let window = makeWindowIfNeeded()
         AppModel.shared.preparePreferencesPresentation()
         applyPresentation(to: window)
-        if created || !isFrameUsable(window.frame) {
+        if !isFrameUsable(window.frame) {
             window.setContentSize(NSSize(width: 640, height: 520))
             centerOnActiveScreen(window)
         }
@@ -74,11 +73,11 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         window.isOpaque = true
         window.backgroundColor = .windowBackgroundColor
         window.isReleasedWhenClosed = false
-        window.setFrameAutosaveName("SSRPreferences")
         window.delegate = self
         window.level = .floating
         window.tabbingMode = .disallowed
         window.setContentSize(NSSize(width: 640, height: 520))
+        window.setFrameAutosaveName("SSRPreferences")
         self.window = window
         observeSetupState()
         return window
