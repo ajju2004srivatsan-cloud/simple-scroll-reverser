@@ -113,7 +113,7 @@ struct SetupGuideView: View {
         .controlSize(.regular)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onAppear {
-            model.requestPrivacyListEntries()
+            model.refreshPermissions()
         }
     }
 

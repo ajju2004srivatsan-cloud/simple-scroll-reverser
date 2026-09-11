@@ -69,10 +69,14 @@ final class PermissionMonitor: @unchecked Sendable {
 
 enum PrivacySettingsOpener {
     static let quarantineRemovalCommand = "xattr -cr \"/Applications/Simple Scroll Reverser.app\""
+    private static var didRequestThisLaunch = false
 
     /// Ask macOS to create the Accessibility and Input Monitoring rows for this
-    /// process. The system prompt only appears when the process is not trusted.
-    static func requestPrivacyListEntries() {
+    /// process. Automatic prompts run at most once per launch; explicit Setup
+    /// buttons pass `force` so the user can try again.
+    static func requestPrivacyListEntries(force: Bool = false) {
+        if !force && didRequestThisLaunch { return }
+        didRequestThisLaunch = true
         let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as NSString
         AXIsProcessTrustedWithOptions([promptKey: true] as CFDictionary)
         CGRequestListenEventAccess()
@@ -89,7 +93,7 @@ enum PrivacySettingsOpener {
     }
 
     static func openAccessibilityAndPrompt() {
-        requestPrivacyListEntries()
+        requestPrivacyListEntries(force: true)
         openFirstWorking([
             "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility",
             "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility"
@@ -97,7 +101,7 @@ enum PrivacySettingsOpener {
     }
 
     static func openInputMonitoringAndPrompt() {
-        requestPrivacyListEntries()
+        requestPrivacyListEntries(force: true)
         openFirstWorking([
             "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent",
             "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_ListenEvent"
