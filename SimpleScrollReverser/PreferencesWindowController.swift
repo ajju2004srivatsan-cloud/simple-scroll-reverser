@@ -28,15 +28,21 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         }
 
         let hosting = NSHostingController(rootView: PreferencesView())
-        hosting.sizingOptions = [.preferredContentSize]
+        hosting.sizingOptions = [.preferredContentSize, .minSize]
 
         let window = NSWindow(contentViewController: hosting)
         window.title = AppIdentity.displayName
         window.styleMask = [.titled, .closable]
+        window.titleVisibility = .visible
+        window.titlebarAppearsTransparent = false
+        window.isOpaque = true
+        window.backgroundColor = .windowBackgroundColor
         window.isReleasedWhenClosed = false
         window.setFrameAutosaveName("SSRPreferences")
         window.delegate = self
         window.level = .normal
+        window.tabbingMode = .disallowed
+        window.setContentSize(NSSize(width: 640, height: 520))
         self.window = window
         return window
     }

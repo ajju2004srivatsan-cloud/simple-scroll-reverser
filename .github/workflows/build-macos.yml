@@ -1,0 +1,78 @@
+name: Build macOS app
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-macos-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and package
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          xcodebuild -version
+          xcrun swift --version
+          sudo xcode-select -p
+
+      - name: Build and zip
+        run: |
+          chmod +x Scripts/package_app.sh
+          ./Scripts/package_app.sh
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SimpleScrollReverser
+          path: dist/SimpleScrollReverser.zip
+          if-no-files-found: error
+
+      - name: Publish GitHub Release (version tag)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/SimpleScrollReverser.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          body: |
+            Ready-to-run build of **Simple Scroll Reverser**.
+
+            1. Download `SimpleScrollReverser.zip` and unzip it.
+            2. Move `Simple Scroll Reverser.app` to `/Applications`.
+            3. This build is ad-hoc signed (not Developer ID notarized). The first time, right-click the app → **Open**, or run:
+               `xattr -cr "/Applications/Simple Scroll Reverser.app"`
+            4. Grant **Accessibility** (and **Input Monitoring** if asked) in System Settings.
+
+      - name: Publish latest pre-release (main)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build
+          prerelease: true
+          make_latest: false
+          target_commitish: ${{ github.sha }}
+          files: dist/SimpleScrollReverser.zip
+          fail_on_unmatched_files: true
+          body: |
+            Rolling build from `main` (updated on each merge).
+
+            Prefer a numbered tag (`v1.0.0`) release when one exists: https://github.com/${{ github.repository }}/releases/latest
+
+            1. Download `SimpleScrollReverser.zip` and unzip it.
+            2. Move `Simple Scroll Reverser.app` to `/Applications`.
+            3. Ad-hoc signed — first launch: right-click → **Open**, or `xattr -cr "/Applications/Simple Scroll Reverser.app"`
+            4. Grant Accessibility (and Input Monitoring if asked).

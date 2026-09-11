@@ -13,6 +13,8 @@ xcuserdata/
 # Build
 build/
 .build/
+.derivedData/
+dist/
 *.o
 *.pyc
 __pycache__/
