@@ -7,20 +7,36 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
 
     private var window: NSWindow?
 
-    func show() {
+    func show(forceAttention: Bool = false) {
         let created = window == nil
         let window = makeWindowIfNeeded()
+        AppModel.shared.preparePreferencesPresentation()
+
+        window.title = AppModel.shared.isShowingSetup
+            ? "\(AppIdentity.displayName) — Setup"
+            : AppIdentity.displayName
+        // Stay Dock-less (LSUIElement) but float above other apps so the window
+        // is findable when the menu bar extra is hidden or not yet noticed.
+        window.level = forceAttention || AppModel.shared.isShowingSetup ? .floating : .normal
+        window.collectionBehavior = [.moveToActiveSpace, .fullScreenAuxiliary]
+
         if #available(macOS 14.0, *) {
             NSApp.activate()
         } else {
             NSApp.activate(ignoringOtherApps: true)
         }
-        if created {
+        if created || !isFrameUsable(window.frame) {
+            window.setContentSize(NSSize(width: 640, height: 520))
             window.center()
         }
         window.makeKeyAndOrderFront(nil)
-        window.collectionBehavior = [.moveToActiveSpace]
-        AppModel.shared.preparePreferencesPresentation()
+        window.orderFrontRegardless()
+        NSApp.arrangeInFront(nil)
+    }
+
+    private func isFrameUsable(_ frame: NSRect) -> Bool {
+        guard frame.width >= 400, frame.height >= 280 else { return false }
+        return NSScreen.screens.contains { $0.visibleFrame.intersects(frame) }
     }
 
     private func makeWindowIfNeeded() -> NSWindow {
