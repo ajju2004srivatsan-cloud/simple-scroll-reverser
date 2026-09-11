@@ -69,7 +69,8 @@ final class PermissionMonitor: @unchecked Sendable {
 
 enum PrivacySettingsOpener {
     static func openAccessibilityAndPrompt() {
-        let options = [kAXTrustedCheckOptionPrompt as String: true] as CFDictionary
+        let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
+        let options = [promptKey: true] as CFDictionary
         AXIsProcessTrustedWithOptions(options)
         open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"))
     }

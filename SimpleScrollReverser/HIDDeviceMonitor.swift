@@ -33,9 +33,7 @@ final class HIDDeviceMonitor: @unchecked Sendable {
 
         if let devices = IOHIDManagerCopyDevices(manager) {
             for object in (devices as NSSet) {
-                if let device = object as? IOHIDDevice {
-                    remember(device)
-                }
+                remember(object as IOHIDDevice)
             }
         }
 
