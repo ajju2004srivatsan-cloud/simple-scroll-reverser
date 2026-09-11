@@ -23,10 +23,11 @@ xcodebuild \
   ARCHS='arm64 x86_64' \
   ONLY_ACTIVE_ARCH=NO \
   CODE_SIGN_IDENTITY='-' \
-  CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGNING_REQUIRED=YES \
   CODE_SIGNING_ALLOWED=YES \
   ENABLE_HARDENED_RUNTIME=NO \
   DEVELOPMENT_TEAM= \
+  OTHER_CODE_SIGN_FLAGS='--identifier=com.ajju2004srivatsan.simplescrollreverser' \
   build
 
 APP="$DERIVED/Build/Products/${CONFIGURATION}/${PRODUCT_NAME}.app"
@@ -37,7 +38,10 @@ if [[ ! -d "$APP" ]]; then
 fi
 
 echo "==> Ad-hoc signing"
-codesign --force --deep --sign - --timestamp=none "$APP"
+codesign --force --deep --sign - \
+  --identifier com.ajju2004srivatsan.simplescrollreverser \
+  --timestamp=none \
+  "$APP"
 codesign --verify --verbose=2 "$APP" || true
 
 mkdir -p "$DIST"

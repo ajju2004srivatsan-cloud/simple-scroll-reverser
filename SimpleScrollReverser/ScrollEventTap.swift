@@ -158,6 +158,26 @@ final class ScrollEventTap: @unchecked Sendable {
         }
     }
 
+    /// Best-effort HID tap so macOS records this process under Accessibility
+    /// and Input Monitoring even when the real tap cannot stay installed yet.
+    static func probeForTCC() {
+        let mask = CGEventMask(1 << CGEventType.scrollWheel.rawValue)
+        for options: CGEventTapOptions in [.listenOnly, .defaultTap] {
+            guard let tap = CGEvent.tapCreate(
+                tap: .cghidEventTap,
+                place: .headInsertEventTap,
+                options: options,
+                eventsOfInterest: mask,
+                callback: tccProbeCallback,
+                userInfo: nil
+            ) else {
+                continue
+            }
+            CGEvent.tapEnable(tap: tap, enable: false)
+            CFMachPortInvalidate(tap)
+        }
+    }
+
     private func runTapThread() {
         let mask = CGEventMask(1 << CGEventType.scrollWheel.rawValue)
         let userInfo = Unmanaged.passUnretained(self).toOpaque()
@@ -221,4 +241,13 @@ private func scrollTapCallback(
     }
     let tap = Unmanaged<ScrollEventTap>.fromOpaque(refcon).takeUnretainedValue()
     return tap.handle(type: type, event: event)
+}
+
+private func tccProbeCallback(
+    _: CGEventTapProxy,
+    _: CGEventType,
+    event: CGEvent,
+    _: UnsafeMutableRawPointer?
+) -> Unmanaged<CGEvent>? {
+    Unmanaged.passUnretained(event)
 }

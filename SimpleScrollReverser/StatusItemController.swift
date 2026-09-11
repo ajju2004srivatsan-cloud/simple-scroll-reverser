@@ -8,8 +8,13 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     func install() {
+        precondition(Thread.isMainThread)
+        // A previous build used autosaveName "SSRStatusItem", which can restore
+        // a hidden extra. Never autosave; clear any leftover.
+        UserDefaults.standard.removeObject(forKey: "NSStatusItem Visible SSRStatusItem")
+        UserDefaults.standard.removeObject(forKey: "NSStatusItem Preferred Position SSRStatusItem")
+
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.autosaveName = "SSRStatusItem"
         item.isVisible = true
 
         if let button = item.button {
@@ -87,22 +92,16 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         button.toolTip = AppIdentity.displayName
         button.setAccessibilityTitle(AppIdentity.displayName)
 
-        if let image = Self.statusImage() {
-            image.isTemplate = true
-            image.size = NSSize(width: 18, height: 18)
-            button.image = image
-            button.title = ""
-            button.imagePosition = .imageOnly
-            button.imageScaling = .scaleProportionallyDown
-            statusItem?.length = NSStatusItem.squareLength
-        } else {
-            // Image-only + nil image is an empty control. Keep a short high-contrast title.
-            button.image = nil
-            button.title = "⇅"
-            button.imagePosition = .imageLeading
-            button.font = NSFont.menuBarFont(ofSize: 13)
-            statusItem?.length = max(NSStatusItem.squareLength, 28)
-        }
+        let image = Self.statusImage() ?? Self.drawnTemplateImage()
+        image.isTemplate = true
+        image.size = NSSize(width: 18, height: 18)
+        button.image = image
+        button.title = "⇅"
+        button.imagePosition = .imageLeading
+        button.imageScaling = .scaleProportionallyDown
+        button.font = NSFont.menuBarFont(ofSize: 13)
+        statusItem?.length = NSStatusItem.squareLength
+        statusItem?.isVisible = true
     }
 
     /// Bundled template, then a drawn glyph, then SF Symbols. Nil only if nothing usable loaded.
