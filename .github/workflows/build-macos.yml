@@ -50,11 +50,11 @@ jobs:
           body: |
             Ready-to-run build of **Simple Scroll Reverser**.
 
-            1. Download `SimpleScrollReverser.zip` and unzip it.
-            2. Move `Simple Scroll Reverser.app` to `/Applications`.
-            3. This build is ad-hoc signed (not Developer ID notarized). The first time, right-click the app → **Open**, or run:
-               `xattr -cr "/Applications/Simple Scroll Reverser.app"`
-            4. Grant **Accessibility** (and **Input Monitoring** if asked) in System Settings.
+            1. Download `SimpleScrollReverser.zip`, unzip it, and move `Simple Scroll Reverser.app` to `/Applications`.
+            2. If macOS shows **“Simple Scroll Reverser” Not Opened** (Apple could not verify it is free of malware): that is Gatekeeper, *before* the app launches. Open **System Settings → Privacy & Security**, scroll to **Security**, click **Open Anyway**. Or Control-click the app → Open → Open.
+            3. Terminal fallback: `xattr -cr "/Applications/Simple Scroll Reverser.app"`
+            4. This zip is ad-hoc signed, not Developer ID notarized — the app cannot bypass that first dialog.
+            5. After it opens, use the Setup Guide to grant **Accessibility** (required) and **Input Monitoring** (recommended).
 
       - name: Publish latest pre-release (main)
         if: github.ref == 'refs/heads/main'
@@ -72,7 +72,7 @@ jobs:
 
             Prefer a numbered tag (`v1.0.0`) release when one exists: https://github.com/${{ github.repository }}/releases/latest
 
-            1. Download `SimpleScrollReverser.zip` and unzip it.
-            2. Move `Simple Scroll Reverser.app` to `/Applications`.
-            3. Ad-hoc signed — first launch: right-click → **Open**, or `xattr -cr "/Applications/Simple Scroll Reverser.app"`
-            4. Grant Accessibility (and Input Monitoring if asked).
+            1. Download `SimpleScrollReverser.zip`, unzip, move `Simple Scroll Reverser.app` to `/Applications`.
+            2. **If Mac says Not Opened:** System Settings → Privacy & Security → Security → **Open Anyway**, or Control-click → Open → Open. Fallback: `xattr -cr "/Applications/Simple Scroll Reverser.app"`
+            3. Ad-hoc signed, not notarized — Gatekeeper runs before the app starts; nothing in the app bypasses it.
+            4. Then use the in-app Setup Guide for Accessibility and Input Monitoring.
