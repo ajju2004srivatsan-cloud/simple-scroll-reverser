@@ -27,10 +27,11 @@ final class AppModel: ObservableObject {
         let loaded = AppSettings.load()
         settings = loaded
         SettingsStore.shared.update(loaded)
-        permissions = PermissionMonitor.currentState()
+        let permissionState = PermissionMonitor.currentState()
+        permissions = permissionState
         loginItemEnabled = LoginItemService.isEnabled
         loginItemHint = LoginItemService.statusHint
-        isShowingSetup = !AppSettings.hasCompletedSetup || !permissions.canInstallEventTap
+        isShowingSetup = !AppSettings.hasCompletedSetup || !permissionState.canInstallEventTap
     }
 
     func start() {
