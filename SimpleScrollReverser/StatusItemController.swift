@@ -14,7 +14,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         UserDefaults.standard.removeObject(forKey: "NSStatusItem Visible SSRStatusItem")
         UserDefaults.standard.removeObject(forKey: "NSStatusItem Preferred Position SSRStatusItem")
 
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.isVisible = true
 
         if let button = item.button {
@@ -100,7 +100,11 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         button.imagePosition = .imageLeading
         button.imageScaling = .scaleProportionallyDown
         button.font = NSFont.menuBarFont(ofSize: 13)
-        statusItem?.length = NSStatusItem.squareLength
+        button.sizeToFit()
+        let fitted = button.fittingSize.width
+        statusItem?.length = (fitted.isFinite && fitted > 0)
+            ? max(NSStatusItem.squareLength, ceil(fitted))
+            : NSStatusItem.variableLength
         statusItem?.isVisible = true
     }
 

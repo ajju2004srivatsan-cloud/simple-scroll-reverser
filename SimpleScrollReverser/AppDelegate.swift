@@ -31,7 +31,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         AppModel.shared.start()
-        AppModel.shared.requestPrivacyListEntries()
+        if AppModel.shared.shouldShowPreferencesOnLaunch || AppModel.shared.permissions.needsAttention {
+            AppModel.shared.requestPrivacyListEntries()
+        }
 
         if AppModel.shared.shouldShowPreferencesOnLaunch {
             PreferencesWindowController.shared.show(forceAttention: true)

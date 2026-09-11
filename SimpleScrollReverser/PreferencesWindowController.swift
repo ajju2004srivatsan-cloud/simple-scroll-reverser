@@ -10,11 +10,14 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
     private var cancellables = Set<AnyCancellable>()
 
     func show(forceAttention _: Bool = false) {
+        let created = window == nil
         let window = makeWindowIfNeeded()
         AppModel.shared.preparePreferencesPresentation()
         applyPresentation(to: window)
-        window.setContentSize(NSSize(width: 640, height: 520))
-        centerOnActiveScreen(window)
+        if created || !isFrameUsable(window.frame) {
+            window.setContentSize(NSSize(width: 640, height: 520))
+            centerOnActiveScreen(window)
+        }
 
         if #available(macOS 14.0, *) {
             NSApp.activate()
@@ -48,6 +51,11 @@ final class PreferencesWindowController: NSObject, NSWindowDelegate {
         frame.origin.x = visible.midX - frame.width / 2
         frame.origin.y = visible.midY - frame.height / 2
         window.setFrame(frame, display: true)
+    }
+
+    private func isFrameUsable(_ frame: NSRect) -> Bool {
+        guard frame.width >= 400, frame.height >= 280 else { return false }
+        return NSScreen.screens.contains { $0.visibleFrame.intersects(frame) }
     }
 
     private func makeWindowIfNeeded() -> NSWindow {
