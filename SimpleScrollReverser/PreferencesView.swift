@@ -153,6 +153,7 @@ struct PreferencesView: View {
         .formStyle(.grouped)
         .toggleStyle(.switch)
         .controlSize(.regular)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var permissionsSection: some View {
