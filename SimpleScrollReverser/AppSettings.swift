@@ -51,6 +51,7 @@ extension AppSettings {
         static let reverseHorizontal = "reverseHorizontal"
         static let wheelStepSize = "wheelStepSize"
         static let hasLaunchedBefore = "hasLaunchedBefore"
+        static let hasCompletedSetup = "hasCompletedSetup"
     }
 
     static func load(from defaults: UserDefaults = .standard) -> AppSettings {
@@ -84,6 +85,11 @@ extension AppSettings {
         defaults.set(reverseVertical, forKey: Key.reverseVertical)
         defaults.set(reverseHorizontal, forKey: Key.reverseHorizontal)
         defaults.set(wheelStepSize, forKey: Key.wheelStepSize)
+    }
+
+    static var hasCompletedSetup: Bool {
+        get { UserDefaults.standard.bool(forKey: Key.hasCompletedSetup) }
+        set { UserDefaults.standard.set(newValue, forKey: Key.hasCompletedSetup) }
     }
 
     static var hasLaunchedBefore: Bool {

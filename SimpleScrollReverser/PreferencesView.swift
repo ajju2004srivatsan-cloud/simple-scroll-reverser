@@ -39,7 +39,11 @@ struct PreferencesView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            if model.permissions.needsAttention {
+            if model.isShowingSetup {
+                Label("Setup", systemImage: "list.bullet")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else if model.permissions.needsAttention {
                 Label("Permissions needed", systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -47,6 +51,20 @@ struct PreferencesView: View {
             }
 
             Spacer(minLength: 12)
+
+            if model.isShowingSetup {
+                Button("Continue to Preferences") {
+                    model.completeSetup()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.small)
+                .disabled(!model.permissions.canInstallEventTap)
+            } else {
+                Button("Setup Guide…") {
+                    model.showSetupGuide()
+                }
+                .controlSize(.small)
+            }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Version \(Bundle.main.shortVersionString)")
@@ -63,6 +81,16 @@ struct PreferencesView: View {
     }
 
     private var detail: some View {
+        Group {
+            if model.isShowingSetup {
+                SetupGuideView()
+            } else {
+                preferencesForm
+            }
+        }
+    }
+
+    private var preferencesForm: some View {
         Form {
             if model.permissions.needsAttention {
                 permissionsSection
@@ -145,6 +173,9 @@ struct PreferencesView: View {
             Section {
                 Button("Check Permissions") {
                     model.refreshPermissions()
+                }
+                Button("Open Setup Guide") {
+                    model.showSetupGuide()
                 }
             } footer: {
                 Text("The sidebar doodle shows mouse and trackpad direction independently. It pauses when Reduce Motion is on.")
